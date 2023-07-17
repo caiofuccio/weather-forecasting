@@ -1,12 +1,15 @@
 {
     "root": true,
     "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint"
-    ],
+    "plugins": ["@typescript-eslint"],
     "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/eslint-recommended",
-      "plugin:@typescript-eslint/recommended"
-    ]
-  }
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "settings": {
+        "import/resolver": {
+            "alias": [["@src", "./src"], ["@tests", "./__tests__"]]
+        }
+    }
+}
