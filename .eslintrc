@@ -9,7 +9,10 @@
     ],
     "settings": {
         "import/resolver": {
-            "alias": [["@src", "./src"], ["@tests", "./__tests__"]]
+            "alias": [
+                ["@src", "./src"],
+                ["@tests", "./tests"]
+            ]
         }
     }
 }
