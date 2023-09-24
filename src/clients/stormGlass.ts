@@ -1,36 +1,12 @@
+import {
+    ForecastPoint,
+    StormGlassForecastResponse,
+    StormGlassPoint,
+} from '@src/types';
 import { InternalError } from '@src/utils';
-import { AxiosError, AxiosStatic } from 'axios';
+import * as HttpUtil from '@src/utils/request';
+import { AxiosError } from 'axios';
 import config, { IConfig } from 'config';
-
-export interface StormGlassPointSource {
-    [key: string]: number;
-}
-
-export interface StormGlassPoint {
-    time: string;
-    readonly waveHeight: StormGlassPointSource;
-    readonly waveDirection: StormGlassPointSource;
-    readonly swellDirection: StormGlassPointSource;
-    readonly swellHeight: StormGlassPointSource;
-    readonly swellPeriod: StormGlassPointSource;
-    readonly windDirection: StormGlassPointSource;
-    readonly windSpeed: StormGlassPointSource;
-}
-
-export interface StormGlassForecastResponse {
-    hours: Array<StormGlassPoint>;
-}
-
-export interface ForecastPoint {
-    time: string;
-    waveHeight: number;
-    waveDirection: number;
-    swellDirection: number;
-    swellHeight: number;
-    swellPeriod: number;
-    windDirection: number;
-    windSpeed: number;
-}
 
 export class ClientRequestError extends InternalError {
     constructor(message: string) {
@@ -56,7 +32,7 @@ export class StormGlass {
         'swellDirection,swellHeight,swellPeriod,waveDirection,waveHeight,windDirection,windSpeed';
     readonly stormGlassSource = 'noaa';
 
-    constructor(protected request: AxiosStatic) {}
+    constructor(protected request = new HttpUtil.Request()) {}
 
     public async fetchPoints(
         latitude: number,
@@ -80,7 +56,11 @@ export class StormGlass {
         } catch (err) {
             const axiosError = err as AxiosError;
 
-            if (axiosError.response && axiosError.response.status) {
+            if (
+                axiosError &&
+                axiosError.response &&
+                HttpUtil.Request.isRequestError(axiosError)
+            ) {
                 throw new StormGlassResponseError(
                     `Error: ${JSON.stringify(axiosError.response.data)} Code: ${
                         axiosError.response.status
