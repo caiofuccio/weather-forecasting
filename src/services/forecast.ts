@@ -1,5 +1,12 @@
 import { StormGlass } from '@src/clients';
-import { Beach, BeachForecast, TimeForecast } from '@src/types';
+import { Beach, BeachForecast, ForecastPoint, TimeForecast } from '@src/types';
+import { InternalError } from '@src/utils';
+
+export class ForecastProcessingInternalError extends InternalError {
+    constructor(message: string) {
+        super(`Unexpected error during the forecast processing: ${message}`);
+    }
+}
 
 export class Forecast {
     constructor(protected stormGlass = new StormGlass()) {}
@@ -8,21 +15,35 @@ export class Forecast {
         beaches: Array<Beach>
     ): Promise<Array<TimeForecast>> {
         const pointsWithCorrectSources: Array<BeachForecast> = [];
-        for (const beach of beaches) {
-            const { lat, lng, name, position } = beach;
-            const points = await this.stormGlass.fetchPoints(lat, lng);
-            const enrichedBeachData = points.map((pointData) => ({
-                lat,
-                lng,
-                name,
-                position,
-                rating: 1,
-                ...pointData,
-            }));
-            pointsWithCorrectSources.push(...enrichedBeachData);
-        }
 
-        return this.mapForecastByTime(pointsWithCorrectSources);
+        try {
+            for (const beach of beaches) {
+                const { lat, lng } = beach;
+                const points = await this.stormGlass.fetchPoints(lat, lng);
+                const enrichedBeachData = this.enricheBeachData(points, beach);
+                pointsWithCorrectSources.push(...enrichedBeachData);
+            }
+
+            return this.mapForecastByTime(pointsWithCorrectSources);
+        } catch (error) {
+            throw new ForecastProcessingInternalError((error as Error).message);
+        }
+    }
+
+    private enricheBeachData(
+        points: ForecastPoint[],
+        beach: Beach
+    ): BeachForecast[] {
+        const { lat, lng, name, position } = beach;
+
+        return points.map((pointData) => ({
+            lat,
+            lng,
+            name,
+            position,
+            rating: 1,
+            ...pointData,
+        }));
     }
 
     private mapForecastByTime(
