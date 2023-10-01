@@ -20,7 +20,7 @@ export class Forecast {
             for (const beach of beaches) {
                 const { lat, lng } = beach;
                 const points = await this.stormGlass.fetchPoints(lat, lng);
-                const enrichedBeachData = this.enricheBeachData(points, beach);
+                const enrichedBeachData = this.enrichBeachData(points, beach);
                 pointsWithCorrectSources.push(...enrichedBeachData);
             }
 
@@ -30,7 +30,7 @@ export class Forecast {
         }
     }
 
-    private enricheBeachData(
+    private enrichBeachData(
         points: ForecastPoint[],
         beach: Beach
     ): BeachForecast[] {
