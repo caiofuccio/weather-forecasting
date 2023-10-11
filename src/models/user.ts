@@ -1,4 +1,5 @@
 import { UserModel } from '@src/types/UserModel';
+import { CUSTOM_VALIDATION } from '@src/utils';
 import mongoose, { Model } from 'mongoose';
 
 const schema = new mongoose.Schema<UserModel>(
@@ -19,6 +20,16 @@ const schema = new mongoose.Schema<UserModel>(
             },
         },
     }
+);
+
+schema.path('email').validate(
+    async (email: string) => {
+        const emailCount = await mongoose.models.User.countDocuments({ email });
+
+        return !emailCount;
+    },
+    'already exists in the database.',
+    CUSTOM_VALIDATION.DUPLICATED
 );
 
 export const User: Model<UserModel> = mongoose.model('User', schema);
