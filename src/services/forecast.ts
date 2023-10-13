@@ -8,7 +8,7 @@ export class ForecastProcessingInternalError extends InternalError {
     }
 }
 
-export class Forecast {
+export class ForecastService {
     constructor(protected stormGlass = new StormGlass()) {}
 
     public async processForecastForBeaches(
