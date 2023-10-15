@@ -1,12 +1,19 @@
 import { Beach } from '@src/types';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 
-const schema = new mongoose.Schema<Beach>(
+interface BeachModel extends Omit<Beach, '_id'>, Document {}
+
+const schema = new mongoose.Schema<BeachModel>(
     {
         lat: { type: Number, required: true },
         lng: { type: Number, required: true },
         name: { type: String, required: true },
         position: { type: String, required: true },
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        } as unknown as string,
     },
     {
         toJSON: {
@@ -19,4 +26,4 @@ const schema = new mongoose.Schema<Beach>(
     }
 );
 
-export const BeachModel: Model<Beach> = mongoose.model('Beach', schema);
+export const BeachModel: Model<BeachModel> = mongoose.model('Beach', schema);

@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import config from 'config';
+import { DecodedUser } from '@src/types';
 
 export class AuthService {
     public static async hashPassword(
@@ -21,5 +22,12 @@ export class AuthService {
         return jwt.sign(payload, config.get<string>('App.auth.key'), {
             expiresIn: config.get<string>('App.auth.tokenExpiresIn'),
         });
+    }
+
+    public static decodeToken(token: string): DecodedUser {
+        return jwt.verify(
+            token,
+            config.get<string>('App.auth.key')
+        ) as DecodedUser;
     }
 }

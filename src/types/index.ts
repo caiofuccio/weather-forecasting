@@ -1,5 +1,6 @@
 export * from './Beach';
 export * from './BeachForecast';
+export * from './DecodedUser';
 export * from './ForecastPoint';
 export * from './RequestConfig';
 export * from './Response';
